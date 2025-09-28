@@ -1,9 +1,63 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>Hello</title>
-    </head>
-    
-    <body>
-        <h1>Hello World!</h1>
-    </body>
+<head>
+    <title>网络速度测试</title>
+    <meta charset="UTF-8">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 50px auto; 
+            padding: 20px;
+        }
+        .result { 
+            background: #f5f5f5; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 5px;
+        }
+        .info-item {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>网络连接检测</h1>
+    <div id="status">检测中，请稍候...</div>
+    <div id="result" class="result" style="display:none;"></div>
+
+    <script>
+        // 发起跨域请求
+        fetch('https://rsb.pingan.com.cn/itam/mas/linden/ip/request')
+        .then(response => {
+            console.log('CORS头部:', response.headers.get('Access-Control-Allow-Origin'));
+            if (!response.ok) {
+                throw new Error('网络响应不正常');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // 显示获取的信息
+            document.getElementById('status').innerHTML = '检测完成';
+            document.getElementById('result').style.display = 'block';
+            
+            document.getElementById('result').innerHTML = `
+                <h3>您的网络信息：</h3>
+                <div class="info-item"><strong>IP地址：</strong>${data.data.ip}</div>
+                <div class="info-item"><strong>地理位置：</strong>${data.data.country} ${data.data.region} ${data.data.city}</div>
+                <div class="info-item"><strong>经纬度：</strong>${data.data.longitude}, ${data.data.latitude}</div>
+                <div class="info-item"><strong>网络运营商：</strong>${data.data.isp}</div>
+                <div class="info-item"><strong>时区：</strong>${data.data.timeZone}</div>
+            `;
+            
+            // 记录到控制台
+            console.log('获取的位置信息:', data);
+            
+        })
+        .catch(error => {
+            document.getElementById('status').innerHTML = '检测失败: ' + error.message;
+            console.error('错误:', error);
+        });
+    </script>
+</body>
 </html>
